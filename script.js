@@ -64,3 +64,21 @@ const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
+
+const displayTransactions = function (transactions) {
+  containerTransactions.innerHTML = '';
+  transactions.forEach(function (trans, index) {
+    const transType = trans > 0 ? 'deposit' : 'withdrawal';
+    const transactionRow = `
+    <div class="transactions__row">
+        <div class="transactions__type transactions__type--${transType}">
+  ${index + 1} ${transType}
+        </div>
+        <div class="transactions__value">${trans}</div>
+    </div>
+    `;
+    containerTransactions.insertAdjacentHTML('afterbegin', transactionRow);
+  });
+};
+
+displayTransactions(account1.transactions);
