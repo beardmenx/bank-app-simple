@@ -96,4 +96,10 @@ const createNicknames = userAccounts => {
   });
 };
 createNicknames(accounts);
-console.log(accounts);
+
+const displayBalance = transactions => {
+  const balance = transactions.reduce((acc, trans) => acc + trans, 0);
+  labelBalance.textContent = `${balance}$`;
+};
+
+displayBalance(account1.transactions);
