@@ -65,6 +65,7 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+// Вывод транзакций
 const displayTransactions = function (transactions) {
   containerTransactions.innerHTML = '';
   transactions.forEach(function (trans, index) {
@@ -82,3 +83,17 @@ const displayTransactions = function (transactions) {
 };
 
 displayTransactions(account1.transactions);
+
+// Получение Никнейма  //  пример имя 'Oliver Avila' nickname = 'oa'
+
+const createNicknames = userAccounts => {
+  userAccounts.forEach(account => {
+    account.nickname = account.userName
+      .toLowerCase()
+      .split(' ')
+      .map(word => word[0])
+      .join('');
+  });
+};
+createNicknames(accounts);
+console.log(accounts);
