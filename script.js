@@ -82,8 +82,6 @@ const displayTransactions = function (transactions) {
   });
 };
 
-displayTransactions(account1.transactions);
-
 // Получение Никнейма  //  пример имя 'Oliver Avila' nickname = 'oa'
 
 const createNicknames = userAccounts => {
@@ -103,24 +101,22 @@ const displayBalance = transactions => {
   labelBalance.textContent = `${balance}$`;
 };
 
-displayBalance(account1.transactions);
-
 //  Получение и вывод средств и проработка метода reduce, filter
 
-const displayTotal = function (transactions) {
-  const depositesTotal = transactions
+const displayTotal = function (account) {
+  const depositesTotal = account.transactions
     .filter(trans => trans > 0)
     .reduce((acc, trans) => acc + trans, 0);
   labelSumIn.textContent = `${depositesTotal}$`;
 
-  const withdrawalsTotal = transactions
+  const withdrawalsTotal = account.transactions
     .filter(trans => trans < 0)
     .reduce((acc, trans) => acc + trans, 0);
   labelSumOut.textContent = `${withdrawalsTotal}$`;
 
-  const interestTotal = transactions
+  const interestTotal = account.transactions
     .filter(trans => trans > 0)
-    .map(depos => (depos * 1.1) / 100)
+    .map(depos => (depos * account.interest) / 100)
     // Если процент от депозита больше 5 долларов
     .filter((interest, index, arr) => {
       console.log(arr);
@@ -129,4 +125,33 @@ const displayTotal = function (transactions) {
     .reduce((acc, interest) => acc + interest, 0);
   labelSumInterest.textContent = `${interestTotal}$`;
 };
-displayTotal(account1.transactions);
+
+// Настройка работы логина и пина(пароля) проверка на корректность и вывод соответсвующего UI
+
+let currentAccount;
+
+btnLogin.addEventListener('click', e => {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    account => account.nickname === inputLoginUsername.value
+  );
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI
+    containerApp.style.opacity = 100;
+    labelWelcome.textContent = `Рады что Вы снова c нами ${
+      currentAccount.userName.split(' ')[0]
+    }!`;
+
+    //Clear login & pin
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+    inputLoginPin.blur();
+    //Display transactions
+    displayTransactions(currentAccount.transactions);
+    //Display balance
+    displayBalance(currentAccount.transactions);
+    //Display total
+    displayTotal(currentAccount);
+  }
+});
