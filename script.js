@@ -96,8 +96,9 @@ const createNicknames = userAccounts => {
 createNicknames(accounts);
 
 // Вывод бапанса на экран
-const displayBalance = transactions => {
-  const balance = transactions.reduce((acc, trans) => acc + trans, 0);
+const displayBalance = account => {
+  const balance = account.transactions.reduce((acc, trans) => acc + trans, 0);
+  account.balance = balance;
   labelBalance.textContent = `${balance}$`;
 };
 
@@ -119,7 +120,6 @@ const displayTotal = function (account) {
     .map(depos => (depos * account.interest) / 100)
     // Если процент от депозита больше 5 долларов
     .filter((interest, index, arr) => {
-      console.log(arr);
       return interest >= 5;
     })
     .reduce((acc, interest) => acc + interest, 0);
@@ -127,6 +127,15 @@ const displayTotal = function (account) {
 };
 
 // Настройка работы логина и пина(пароля) проверка на корректность и вывод соответсвующего UI
+
+const updateUi = function (account) {
+  //Display transactions
+  displayTransactions(account.transactions);
+  //Display balance
+  displayBalance(account);
+  //Display total
+  displayTotal(account);
+};
 
 let currentAccount;
 
@@ -147,11 +156,28 @@ btnLogin.addEventListener('click', e => {
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
     inputLoginPin.blur();
-    //Display transactions
-    displayTransactions(currentAccount.transactions);
-    //Display balance
-    displayBalance(currentAccount.transactions);
-    //Display total
-    displayTotal(currentAccount);
+
+    updateUi(currentAccount);
+  }
+});
+
+// Создание функционала для перевода денег
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const transferAmount = Number(inputTransferAmount.value);
+  const recipientNickname = inputTransferTo.value;
+  const recipientAccount = accounts.find(
+    account => account.nickname === recipientNickname
+  );
+  // Проверка счета для передачи денег
+  if (
+    transferAmount > 0 &&
+    currentAccount.balance >= transferAmount &&
+    recipientAccount &&
+    currentAccount.nickname !== recipientAccount.nickname
+  ) {
+    currentAccount.transactions.push(-transferAmount);
+    recipientAccount.transactions.push(transferAmount);
+    updateUi(currentAccount);
   }
 });
