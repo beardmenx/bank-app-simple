@@ -62,7 +62,7 @@ const inputLoginPin = document.querySelector('.login__input--pin');
 const inputTransferTo = document.querySelector('.form__input--to');
 const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputCloseUsername = document.querySelector('.form__input--user');
+const inputCloseNickname = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 // Вывод транзакций
@@ -126,8 +126,6 @@ const displayTotal = function (account) {
   labelSumInterest.textContent = `${interestTotal}$`;
 };
 
-// Настройка работы логина и пина(пароля) проверка на корректность и вывод соответсвующего UI
-
 const updateUi = function (account) {
   //Display transactions
   displayTransactions(account.transactions);
@@ -138,6 +136,8 @@ const updateUi = function (account) {
 };
 
 let currentAccount;
+
+//Event Handlers
 
 btnLogin.addEventListener('click', e => {
   e.preventDefault();
@@ -180,4 +180,22 @@ btnTransfer.addEventListener('click', function (e) {
     recipientAccount.transactions.push(transferAmount);
     updateUi(currentAccount);
   }
+});
+
+//Закрытие счета
+btnClose.addEventListener('click', e => {
+  e.preventDefault();
+  if (
+    inputCloseNickname.value === currentAccount.nickname &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const currentAccountIndex = accounts.findIndex(
+      account => account.nickname === currentAccount.nickname
+    );
+    accounts.splice(currentAccountIndex, 1);
+    containerApp.style.opacity = 0;
+    labelWelcome.textContent = 'Войдите в свой аккаунт';
+  }
+  inputCloseNickname.value = '';
+  inputClosePin.value = '';
 });
