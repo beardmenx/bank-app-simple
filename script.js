@@ -199,3 +199,17 @@ btnClose.addEventListener('click', e => {
   inputCloseNickname.value = '';
   inputClosePin.value = '';
 });
+
+//Запрос займа
+btnLoan.addEventListener('click', e => {
+  e.preventDefault();
+  const LoanAmount = Number(inputLoanAmount.value);
+  if (
+    LoanAmount > 0 &&
+    currentAccount.transactions.some(trans => trans >= (LoanAmount * 10) / 100)
+  ) {
+    currentAccount.transactions.push(LoanAmount);
+    updateUi(currentAccount);
+    inputLoanAmount.value = '';
+  }
+});
