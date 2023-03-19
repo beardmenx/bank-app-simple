@@ -133,6 +133,13 @@ const formatTransactions = function (date, locale) {
   }
 };
 
+const formatCurrency = function (value, locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
+};
+
 const displayTransactions = function (account, sort = false) {
   containerTransactions.innerHTML = '';
 
@@ -145,13 +152,20 @@ const displayTransactions = function (account, sort = false) {
     const date = new Date(account.transactionsDates[index]);
 
     const transDate = formatTransactions(date, account.locale);
+
+    const formattedTrans = formatCurrency(
+      trans,
+      account.locale,
+      account.currency
+    );
+
     const transactionRow = `
     <div class="transactions__row">
         <div class="transactions__type transactions__type--${transType}">
   ${index + 1} ${transType}
         </div>
         <div class="transactions__date"> ${transDate} </div>
-        <div class="transactions__value">${trans.toFixed(2)}</div>
+        <div class="transactions__value">${formattedTrans}</div>
     </div>
     `;
     containerTransactions.insertAdjacentHTML('afterbegin', transactionRow);
@@ -175,7 +189,12 @@ createNicknames(accounts);
 const displayBalance = account => {
   const balance = account.transactions.reduce((acc, trans) => acc + trans, 0);
   account.balance = balance;
-  labelBalance.textContent = `${balance.toFixed(2)}$`;
+
+  labelBalance.textContent = formatCurrency(
+    balance,
+    account.locale,
+    account.currency
+  );
 };
 
 //  Получение и вывод средств и проработка метода reduce, filter
@@ -184,12 +203,20 @@ const displayTotal = function (account) {
   const depositesTotal = account.transactions
     .filter(trans => trans > 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumIn.textContent = `${depositesTotal.toFixed(2)}$`;
+  labelSumIn.textContent = formatCurrency(
+    depositesTotal,
+    account.locale,
+    account.currency
+  );
 
   const withdrawalsTotal = account.transactions
     .filter(trans => trans < 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumOut.textContent = `${withdrawalsTotal}$`;
+  labelSumOut.textContent = formatCurrency(
+    withdrawalsTotal,
+    account.locale,
+    account.currency
+  );
 
   const interestTotal = account.transactions
     .filter(trans => trans > 0)
@@ -199,7 +226,11 @@ const displayTotal = function (account) {
       return interest >= 5;
     })
     .reduce((acc, interest) => acc + interest, 0);
-  labelSumInterest.textContent = `${interestTotal}$`;
+  labelSumInterest.textContent = formatCurrency(
+    interestTotal,
+    account.locale,
+    account.currency
+  );
 };
 
 const updateUi = function (account) {
