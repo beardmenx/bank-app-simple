@@ -119,7 +119,7 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseNickname = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const formatTransactions = function (date) {
+const formatTransactions = function (date, locale) {
   const getDaysBetween2Dates = (date1, date2) =>
     Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
 
@@ -129,11 +129,7 @@ const formatTransactions = function (date) {
   if (daysPassed === 1) return 'Yesterday';
   if (daysPassed <= 7) return `${daysPassed} days ago`;
   else {
-    const day = `${date.getDate()}`.padStart(2, '0');
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const year = date.getFullYear();
-
-    return `${day}/ ${month}/ ${year}`;
+    return new Intl.DateTimeFormat(locale).format(date);
   }
 };
 
@@ -148,7 +144,7 @@ const displayTransactions = function (account, sort = false) {
     const transType = trans > 0 ? 'deposit' : 'withdrawal';
     const date = new Date(account.transactionsDates[index]);
 
-    const transDate = formatTransactions(date);
+    const transDate = formatTransactions(date, account.locale);
     const transactionRow = `
     <div class="transactions__row">
         <div class="transactions__type transactions__type--${transType}">
@@ -219,9 +215,9 @@ let currentAccount;
 
 // Всегда залогинины
 
-// currentAccount = account1;
-// updateUi(currentAccount);
-// containerApp.style.opacity = 100;
+currentAccount = account1;
+updateUi(currentAccount);
+containerApp.style.opacity = 100;
 
 //Event Handlers
 
@@ -239,10 +235,20 @@ btnLogin.addEventListener('click', e => {
     }!`;
 
     const now = new Date();
-    const day = `${now.getDate()}`.padStart(2, '0');
-    const month = `${now.getMonth() + 1}`.padStart(2, '0');
-    const year = now.getFullYear();
-    labelDate.textContent = `${day}/ ${month}/ ${year}`;
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      day: 'numeric',
+      month: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      weekday: 'long',
+    };
+
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale,
+      options
+    ).format(now);
 
     //Clear login & pin
     inputLoginUsername.value = '';
