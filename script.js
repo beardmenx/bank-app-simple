@@ -242,13 +242,33 @@ const updateUi = function (account) {
   displayTotal(account);
 };
 
-let currentAccount;
+let currentAccount, currentLogOutTimer;
 
 // Всегда залогинины
 
-currentAccount = account1;
-updateUi(currentAccount);
-containerApp.style.opacity = 100;
+// currentAccount = account1;
+// updateUi(currentAccount);
+// containerApp.style.opacity = 100;
+
+const startLogoutTimer = function () {
+  const logOutTimerCallback = function () {
+    const minutes = String(Math.trunc(time / 60)).padStart(2, '0');
+    const seconds = String(Math.trunc(time % 60)).padStart(2, '0');
+    labelTimer.textContent = `${minutes}:${seconds}`;
+
+    if (time === 0) {
+      clearInterval(logOutTimer);
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = 'Войдите в свой аккаунт';
+    }
+    time--;
+  };
+
+  let time = 300; // для проверки можно изменить на меньшее число чтобы не ждать 300 сек
+  logOutTimerCallback();
+  const logOutTimer = setInterval(logOutTimerCallback, 1000);
+  return logOutTimer;
+};
 
 //Event Handlers
 
@@ -286,6 +306,10 @@ btnLogin.addEventListener('click', e => {
     inputLoginPin.value = '';
     inputLoginPin.blur();
 
+    // Проверка на существование еще одного таймера !!
+
+    if (currentLogOutTimer) clearInterval(currentLogOutTimer);
+    currentLogOutTimer = startLogoutTimer();
     updateUi(currentAccount);
   }
 });
@@ -314,6 +338,10 @@ btnTransfer.addEventListener('click', function (e) {
     currentAccount.transactionsDates.push(new Date().toISOString());
     recipientAccount.transactionsDates.push(new Date().toISOString());
     updateUi(currentAccount);
+
+    // Reset the Timer - сброс таймера
+    clearInterval(currentLogOutTimer);
+    currentLogOutTimer = startLogoutTimer();
   }
 });
 
@@ -343,11 +371,17 @@ btnLoan.addEventListener('click', e => {
     LoanAmount > 0 &&
     currentAccount.transactions.some(trans => trans >= (LoanAmount * 10) / 100)
   ) {
-    currentAccount.transactions.push(LoanAmount);
-    currentAccount.transactionsDates.push(new Date().toISOString());
-    updateUi(currentAccount);
-    inputLoanAmount.value = '';
+    setTimeout(() => {
+      currentAccount.transactions.push(LoanAmount);
+      currentAccount.transactionsDates.push(new Date().toISOString());
+      updateUi(currentAccount);
+    }, 5000);
   }
+  inputLoanAmount.value = '';
+
+  // Reset the Timer - сброс таймера
+  clearInterval(currentLogOutTimer);
+  currentLogOutTimer = startLogoutTimer();
 });
 
 let transactionsSorted = false;
@@ -371,15 +405,3 @@ logoImage.addEventListener('click', function () {
     }
   });
 });
-
-// const logoImage = document.querySelector('.logo');
-// logoImage.addEventListener('click', function () {
-//   const transactionsUi = document.querySelectorAll('.transactions__value');
-//   console.log(transactionsUi);
-//   // const transactionsUiArray = Array.from(transactionsUi);
-//   // console.log(transactionsUiArray.map(elem => Number(elem.textContent)));
-//   const transactionsUiArray = Array.from(transactionsUi, elem =>
-//     Number(elem.textContent)
-//   );
-//   console.log(transactionsUiArray);
-// });
